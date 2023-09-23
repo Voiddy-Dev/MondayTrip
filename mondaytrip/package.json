@@ -9,6 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@biconomy/core-types": "^3.1.0",
+    "@biconomy/smart-account": "^2.0.2",
+    "@biconomy/web3-auth": "^3.1.0",
     "@radix-ui/react-accordion": "^1.1.2",
     "@types/node": "20.6.3",
     "@types/react": "18.2.22",
