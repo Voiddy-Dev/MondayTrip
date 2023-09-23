@@ -6,6 +6,7 @@ import { publicProvider } from "wagmi/providers/public";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { appId, LensProvider, LensConfig, production } from "@lens-protocol/react-web";
 import { bindings as wagmiBindings } from "@lens-protocol/wagmi";
+import Header from "./header";
 
 const { publicClient, webSocketPublicClient } = configureChains(
   [polygonMumbai, polygon],
@@ -38,10 +39,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html>
       <WagmiConfig config={config}>
         <LensProvider config={lensConfig}>
-          <body>{children}</body>
+          {/* <div>sdfn</div> */}
+          <body>
+            <Header />
+            {children}
+          </body>
         </LensProvider>
       </WagmiConfig>
     </html>
