@@ -19,7 +19,6 @@ const MondayTripSocialLogin = () => {
 
   const connectWeb3 = useCallback(async () => {
     if (typeof window === "undefined") return;
-    console.log("socialLoginSDK", socialLoginSDK);
     if (socialLoginSDK?.provider) {
       const web3Provider = new ethers.providers.Web3Provider(
         socialLoginSDK.provider
@@ -39,16 +38,14 @@ const MondayTripSocialLogin = () => {
     });
     setSocialLoginSDK(sdk);
     sdk.showWallet();
-    console.log("Account...", account);
     return socialLoginSDK;
   }, [socialLoginSDK]);
 
   useEffect(() => {
-    console.log("hidelwallet");
+    console.log("Hiding Wallet - Already logged in");
     if (socialLoginSDK && socialLoginSDK.provider) {
       socialLoginSDK.hideWallet();
     }
-    console.log("socialLoginSDK", socialLoginSDK);
   }, [account, socialLoginSDK]);
 
   useEffect(() => {
@@ -77,27 +74,27 @@ const MondayTripSocialLogin = () => {
     setScwAddress("");
   };
 
-  // useEffect(() => {
-  //   async function setupSmartAccount() {
-  //     setScwAddress("");
-  //     setScwLoading(true);
-  //     const smartAccount = new SmartAccount(provider, {
-  //       activeNetworkId: ChainId.GOERLI,
-  //       supportedNetworksIds: [ChainId.GOERLI],
-  //     });
-  //     await smartAccount.init();
-  //     const context = smartAccount.getSmartAccountContext();
-  //     setScwAddress(context.baseWallet.getAddress());
-  //     setSmartAccount(smartAccount);
-  //     setScwLoading(false);
-  //   }
-  //   if (!!provider && !!account) {
-  //     console.log("Provider...", provider);
-  //     console.log("Account...", account);
-  //     setupSmartAccount();
-  //     // console.log("Provider...", provider);
-  //   }
-  // }, [account, provider]);
+  useEffect(() => {
+    async function setupSmartAccount() {
+      setScwAddress("");
+      setScwLoading(true);
+      const smartAccount = new SmartAccount(provider, {
+        activeNetworkId: ChainId.GOERLI,
+        supportedNetworksIds: [ChainId.GOERLI],
+      });
+      await smartAccount.init();
+      const context = smartAccount.getSmartAccountContext();
+      setScwAddress(context.baseWallet.getAddress());
+      setSmartAccount(smartAccount);
+      setScwLoading(false);
+    }
+    if (!!provider && !!account) {
+      console.log("Provider...", provider);
+      console.log("Account...", account);
+      setupSmartAccount();
+      // console.log("Provider...", provider);
+    }
+  }, [account, provider]);
 
   return (
     <div>
@@ -105,6 +102,22 @@ const MondayTripSocialLogin = () => {
       <button onClick={!account ? connectWeb3 : disconnectWeb3}>
         {!account ? "Connect Wallet" : "Disconnect Wallet"}
       </button>
+
+      {account && (
+        <div>
+          <h2>EOA Address</h2>
+          <p>{account}</p>
+        </div>
+      )}
+
+      {scwLoading && <h2>Loading Smart Account...</h2>}
+
+      {scwAddress && (
+        <div>
+          <h2>Smart Account Address</h2>
+          <p>{scwAddress}</p>
+        </div>
+      )}
     </div>
   );
 }
