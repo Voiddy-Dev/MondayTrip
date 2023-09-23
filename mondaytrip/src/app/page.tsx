@@ -39,6 +39,7 @@ const MondayTripSocialLogin = () => {
     });
     setSocialLoginSDK(sdk);
     sdk.showWallet();
+    console.log("Account...", account);
     return socialLoginSDK;
   }, [socialLoginSDK]);
 
@@ -76,27 +77,27 @@ const MondayTripSocialLogin = () => {
     setScwAddress("");
   };
 
-  useEffect(() => {
-    async function setupSmartAccount() {
-      setScwAddress("");
-      setScwLoading(true);
-      const smartAccount = new SmartAccount(provider, {
-        activeNetworkId: ChainId.GOERLI,
-        supportedNetworksIds: [ChainId.GOERLI],
-      });
-      await smartAccount.init();
-      const context = smartAccount.getSmartAccountContext();
-      setScwAddress(context.baseWallet.getAddress());
-      setSmartAccount(smartAccount);
-      setScwLoading(false);
-    }
-    if (!!provider && !!account) {
-      console.log("Provider...", provider);
-      console.log("Account...", account);
-      setupSmartAccount();
-      // console.log("Provider...", provider);
-    }
-  }, [account, provider]);
+  // useEffect(() => {
+  //   async function setupSmartAccount() {
+  //     setScwAddress("");
+  //     setScwLoading(true);
+  //     const smartAccount = new SmartAccount(provider, {
+  //       activeNetworkId: ChainId.GOERLI,
+  //       supportedNetworksIds: [ChainId.GOERLI],
+  //     });
+  //     await smartAccount.init();
+  //     const context = smartAccount.getSmartAccountContext();
+  //     setScwAddress(context.baseWallet.getAddress());
+  //     setSmartAccount(smartAccount);
+  //     setScwLoading(false);
+  //   }
+  //   if (!!provider && !!account) {
+  //     console.log("Provider...", provider);
+  //     console.log("Account...", account);
+  //     setupSmartAccount();
+  //     // console.log("Provider...", provider);
+  //   }
+  // }, [account, provider]);
 
   return (
     <div>
