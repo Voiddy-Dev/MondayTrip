@@ -1,4 +1,3 @@
-// app/layout.tsx
 "use client";
 import "./globals.css";
 import { polygonMumbai, polygon } from "wagmi/chains";
@@ -30,9 +29,7 @@ const lensConfig: LensConfig = {
   bindings: wagmiBindings(),
   environment: production,
 
-  // Change AppId --> "mondaytrip"
-  appId: appId("orb"),
-  sources: [appId('orb')],
+  sources: [appId("orb")]
 };
 
 export default function RootLayout({
