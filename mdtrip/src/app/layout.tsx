@@ -30,7 +30,8 @@ const lensConfig: LensConfig = {
   bindings: wagmiBindings(),
   environment: production,
 
-  sources: [appId("orb")]
+  appId: appId("mondaytrip"),
+  sources: [appId("mondaytrip")]
 };
 
 export default function RootLayout({
