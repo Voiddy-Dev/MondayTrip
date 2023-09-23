@@ -18,36 +18,36 @@ export default function Explore() {
         sortCriteria: PublicationSortCriteria.TopCollected,
         publicationTypes: [PublicationTypes.Post],
         metadataFilter: {
-            
+
         }
     });
-
-    // Check if the data is loading
-    if (loading) {
-        return <div>Loading...</div>;
-    }
-
-    // Check if there are no publications
-    if (!data?.length) {
-        return <div>No publications found.</div>;
-    }
 
     if (data) {
         console.log(data)
     }
 
-    // Render the publications in a list
+    // Render the publications in a list    
     return (
-        <div className='p-20'>
+        <div className="flex flex-col p-12 items-start">
             <h1>Explore Page</h1>
-            <ul>
-                {data.map(publication => (
-                    <li key={publication.id}>
-                        {publication.__typename}
-                        {/* <Link href={`/publication/${publication.id}`}> */}
-                    </li>
-                ))}
-            </ul>
+            {loading ? (
+                <div>Loading...</div>
+            ) : (
+                <>
+                    {!data || data.length === 0 ? (
+                        <div>No publications were found.</div>
+                    ) : (
+                        <ul>
+                            {data.map(publication => (
+                                <li key={publication.id}>
+                                    {publication.__typename}
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </>
+            )}
+
             {/* Load the next batch of publications if there are more */}
             {hasMore && (
                 <button onClick={next}>Load More</button>
