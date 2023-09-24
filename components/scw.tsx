@@ -1,13 +1,13 @@
-"use client";
-import { Suspense } from "react";
+import styles from "../styles/Home.module.css";
 import { useCallback, useEffect, useState } from "react";
 import { ethers } from "ethers";
 import { ChainId } from "@biconomy/core-types";
 import SocialLogin from "@biconomy/web3-auth";
 import SmartAccount from "@biconomy/smart-account";
 
+import { Button } from "../components/ui/button";
 
-const MondayTripSocialLogin = () => {
+const Home = () => {
   const [provider, setProvider] = useState<any>();
   const [account, setAccount] = useState<string>();
   const [smartAccount, setSmartAccount] = useState<SmartAccount | null>(null);
@@ -19,6 +19,7 @@ const MondayTripSocialLogin = () => {
 
   const connectWeb3 = useCallback(async () => {
     if (typeof window === "undefined") return;
+    console.log("socialLoginSDK", socialLoginSDK);
     if (socialLoginSDK?.provider) {
       const web3Provider = new ethers.providers.Web3Provider(
         socialLoginSDK.provider
@@ -41,13 +42,15 @@ const MondayTripSocialLogin = () => {
     return socialLoginSDK;
   }, [socialLoginSDK]);
 
+  // if wallet already connected close widget
   useEffect(() => {
-    console.log("Hiding Wallet - Already logged in");
+    console.log("hidelwallet");
     if (socialLoginSDK && socialLoginSDK.provider) {
       socialLoginSDK.hideWallet();
     }
   }, [account, socialLoginSDK]);
 
+  // after metamask login -> get provider event
   useEffect(() => {
     const interval = setInterval(async () => {
       if (account) {
@@ -89,46 +92,37 @@ const MondayTripSocialLogin = () => {
       setScwLoading(false);
     }
     if (!!provider && !!account) {
-      console.log("Provider...", provider);
-      console.log("Account...", account);
       setupSmartAccount();
-      // console.log("Provider...", provider);
+      console.log("Provider...", provider);
     }
   }, [account, provider]);
 
   return (
-    <div>
-      <h1>Authentication</h1>
-      <button onClick={!account ? connectWeb3 : disconnectWeb3}>
-        {!account ? "Connect Wallet" : "Disconnect Wallet"}
-      </button>
+    <div className={styles.container}>
+      <main className={styles.main}>
+        <h1>Biconomy SDK Next.js Web3Auth Example</h1>
+        <Button onClick={!account ? connectWeb3 : disconnectWeb3}>
+          {!account ? "Connect Wallet" : "Disconnect Wallet"}
+        </Button>
 
-      {account && (
-        <div>
-          <h2>EOA Address</h2>
-          <p>{account}</p>
-        </div>
-      )}
+        {account && (
+          <div>
+            <h2>EOA Address</h2>
+            <p>{account}</p>
+          </div>
+        )}
 
-      {scwLoading && <h2>Loading Smart Account...</h2>}
+        {scwLoading && <h2>Loading Smart Account...</h2>}
 
-      {scwAddress && (
-        <div>
-          <h2>Smart Account Address</h2>
-          <p>{scwAddress}</p>
-        </div>
-      )}
+        {scwAddress && (
+          <div>
+            <h2>Smart Account Address</h2>
+            <p>{scwAddress}</p>
+          </div>
+        )}
+      </main>
     </div>
   );
-}
+};
 
-export default function Home() {
-
-  return (
-    <div>
-      <Suspense fallback={<div>Loading...</div>}>
-        <MondayTripSocialLogin />
-      </Suspense>
-    </div>
-  );
-}
+export default Home;
