@@ -1,6 +1,12 @@
 import { Web3Button } from "@web3modal/react"
+import { useAccount, useEnsName, useEnsAvatar } from "wagmi"
 
 export default function Header() {
+
+    const { address, isConnecting, isDisconnected } = useAccount()
+    const ensName = useEnsName({ address, chainId: 1 })
+    const ensAvatar = useEnsAvatar({ name: ensName.data, chainId: 1 })
+
     return (
         <div className="flex items-center justify-between py-4 mx-4">
             <div className="flex items-center">
@@ -13,7 +19,7 @@ export default function Header() {
                 <a href="/trips" className="mr-4 text-sm font-medium text-gray-700 hover:text-gray-900">My Trips</a>
             </div>
             <div className="flex items-center">
-                <Web3Button />
+                <Web3Button/>
             </div>
         </div>
     )
