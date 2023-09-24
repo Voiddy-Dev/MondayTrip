@@ -30,7 +30,7 @@ contract Deploy is Script {
         if (cycle == Cycle.Dev) {
             deployerPrivateKey = vm.envUint("DEPLOYER_KEY");
         } else {
-            deployerPrivateKey = vm.envUint("DEPLOYER_KEY");
+            deployerPrivateKey = vm.envUint("LOCAL_KEY");
         }
 
         _;
