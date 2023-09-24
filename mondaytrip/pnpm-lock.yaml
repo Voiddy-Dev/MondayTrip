@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@gatefi/js-sdk':
+    specifier: ^0.12.2
+    version: 0.12.2
   '@radix-ui/react-accordion':
     specifier: ^1.1.2
     version: 1.1.2(@types/react-dom@18.2.7)(@types/react@18.2.22)(react-dom@18.2.0)(react@18.2.0)
@@ -38,6 +41,9 @@ dependencies:
   '@types/react-dom':
     specifier: 18.2.7
     version: 18.2.7
+  '@wagmi/core':
+    specifier: ^1.4.2
+    version: 1.4.2(@types/react@18.2.22)(react@18.2.0)(typescript@5.2.2)(viem@1.12.2)
   '@web3modal/ethereum':
     specifier: ^2.7.1
     version: 2.7.1(@wagmi/core@1.4.2)(viem@1.12.2)
@@ -189,6 +195,10 @@ packages:
   /@eslint/js@8.50.0:
     resolution: {integrity: sha512-NCC3zz2+nvYd+Ckfh87rA47zfu2QsQpvc6k1yzTk+b9KzRj0wkGa8LSoGOXN6Zv4lRf/EIoZ80biDh9HOI+RNQ==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
+    dev: false
+
+  /@gatefi/js-sdk@0.12.2:
+    resolution: {integrity: sha512-v0BW1fZsBfcnB60cRAVjHYbruovgflMqAgl/ZUC1ywmEVA2d3lg2GpsfH9nzyn5BJOQ+h2sFPV2UL1ezpHZ1Qw==}
     dev: false
 
   /@humanwhocodes/config-array@0.11.11:

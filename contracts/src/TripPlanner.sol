@@ -53,6 +53,7 @@ contract TripPlanner {
         uint256 hostelId;
         uint256 numberOfNights;
         uint256 totalPriceToPay;
+        uint256 approvals;
         ProposalStatus status;
     }
 
@@ -81,6 +82,8 @@ contract TripPlanner {
     mapping(uint256 => Proposal[]) public tripProposals;
     mapping(uint256 => Proposal) public tripAcceptedProposal;
     mapping(uint256 => mapping(address => InvitationStatus)) public tripInvitations;
+    mapping(uint256 => uint256) public totalTripPool;
+    mapping(uint256 => mapping(address => uint256)) public tripContributions;
 
     modifier onlyValidAndActiveTrip(uint256 _tripId) {
         Trip memory trip = trips[_tripId];
@@ -161,6 +164,7 @@ contract TripPlanner {
             endDate: _endDate,
             numberOfNights: _numberOfNights,
             hostelId: _hostelId,
+            approvals: 0,
             status: ProposalStatus.Proposed
         });
         tripProposals[_tripId].push(proposal);
@@ -175,10 +179,14 @@ contract TripPlanner {
         tripProposals[_tripId][_proposalId] = proposal;
     }
 
-    function payProposal(uint256 _tripId) external payable onlyValidAndActiveTrip(_tripId) {
+    function payProposal(uint256 _tripId) external onlyValidAndActiveTrip(_tripId) {
         require(
             tripParticipants[_tripId].contains(msg.sender),
             "Only trip participants can pay proposals"
+        );
+        require(
+            totalTripPool[_tripId] >= tripAcceptedProposal[_tripId].totalPriceToPay,
+            "Not enough funds to pay for the trip"
         );
         Proposal memory proposal = tripAcceptedProposal[_tripId];
         require(proposal.status == ProposalStatus.Accepted, "Can only pay for accepted proposals");
@@ -187,6 +195,15 @@ contract TripPlanner {
         Hostel memory hostel = hostels[proposal.hostelId];
         (bool success,) = hostel.owner.call{ value: proposal.totalPriceToPay }("");
         require(success, "Payment failed");
+    }
+
+    function contributeToTrip(uint256 _tripId) external payable onlyValidAndActiveTrip(_tripId) {
+        require(
+            tripParticipants[_tripId].contains(msg.sender),
+            "Only trip participants can contribute to the trip"
+        );
+        totalTripPool[_tripId] += msg.value;
+        tripContributions[_tripId][msg.sender] += msg.value;
     }
 
     function inviteParticipant(uint256 _tripId, address _participant)
@@ -228,6 +245,19 @@ contract TripPlanner {
         trips[_tripId] = trip;
     }
 
+    function approveProposal(uint256 _tripId, uint256 _proposalId)
+        external
+        onlyValidAndActiveTrip(_tripId)
+    {
+        require(
+            tripParticipants[_tripId].contains(msg.sender),
+            "Only trip participants can approve proposals"
+        );
+        Proposal memory proposal = tripProposals[_tripId][_proposalId];
+        proposal.approvals++;
+        tripProposals[_tripId][_proposalId] = proposal;
+    }
+
     function acceptProposal(uint256 _tripId, uint256 _proposalId)
         external
         onlyValidAndActiveTrip(_tripId)
@@ -235,11 +265,17 @@ contract TripPlanner {
         Trip memory trip = trips[_tripId];
         require(msg.sender == trip.organizer, "Only organizer can accept proposals");
         Proposal memory proposal = tripProposals[_tripId][_proposalId];
+        require(
+            proposal.approvals == tripParticipants[_tripId].length(),
+            "Not all participants approved the proposal"
+        );
         proposal.status = ProposalStatus.Accepted;
         trip.status = TripStatus.Booked;
         Hostel memory hostel = hostels[proposal.hostelId];
         hostel.status = HostelStatus.Booked;
         tripAcceptedProposal[_tripId] = proposal;
+        trip.information = TripInformation(proposal.startDate, proposal.endDate, hostel.location);
+        trips[_tripId] = trip;
     }
 
     function removeTripParticipant(uint256 _tripId, address _participant)
@@ -253,12 +289,20 @@ contract TripPlanner {
         return tripProposals[_tripId];
     }
 
+    function getProposal(uint256 _proposalId) external view returns (Proposal memory) {
+        return proposals[_proposalId];
+    }
+
     function getAcceptedProposal(uint256 _tripId) external view returns (Proposal memory) {
         return tripAcceptedProposal[_tripId];
     }
 
     function getTripParticipants(uint256 _tripId) external view returns (address[] memory) {
         return tripParticipants[_tripId].values();
+    }
+
+    function getTripParticipantsAmount(uint256 _tripId) external view returns (uint256) {
+        return tripParticipants[_tripId].length();
     }
 
     function getTrip(uint256 _tripId) external view returns (Trip memory) {
