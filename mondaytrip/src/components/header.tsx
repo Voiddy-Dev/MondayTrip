@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button"
 
 export default function Header() {
     return (
-        <div className="flex items-center justify-between py-4">
+        <div className="flex items-center justify-between py-4 mx-4">
             <div className="flex items-center">
                 <img src="/next.svg" alt="Logo" className="w-10 h-10" />
                 <h1 className="ml-2 text-2xl font-bold">MondayTrip</h1>
