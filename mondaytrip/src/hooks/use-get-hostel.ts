@@ -14,7 +14,7 @@ interface UseGetHostelProps {
 }
 
 
-const useGetTrip = ({
+const useGetHostel = ({
   networkId,
   hostelId,
 }: UseGetHostelProps): UseGetHostelResponse => {
@@ -37,4 +37,4 @@ const useGetTrip = ({
   };
 };
 
-export default useGetTrip;
+export default useGetHostel;

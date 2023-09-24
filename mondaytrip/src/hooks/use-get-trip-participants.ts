@@ -13,7 +13,7 @@ interface UseGetTripParticipantsProps {
 }
 
 
-const useGetAcceptedProposal = ({
+const useGetTripParticipants = ({
   networkId,
   tripId,
 }: UseGetTripParticipantsProps): UseGetTripParticipantsResponse => {
@@ -36,4 +36,4 @@ const useGetAcceptedProposal = ({
   };
 };
 
-export default useGetAcceptedProposal;
+export default useGetTripParticipants;

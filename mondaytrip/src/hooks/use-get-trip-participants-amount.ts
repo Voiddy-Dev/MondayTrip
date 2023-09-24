@@ -2,21 +2,21 @@ import { useContractRead } from 'wagmi';
 import plannerAbi from '../lib/abi';
 import { plannerAddress } from '../lib/constants';
 
-interface UseGetTripParticipantsResponse {
+interface UseGetTripParticipantsAmountResponse {
   participantsAmount: bigint | never[];
   isLoading: boolean;
 }
 
-interface UseGetTripParticipantsProps {
+interface UseGetTripParticipantsAmountProps {
   networkId: number;
   tripId: number;
 }
 
 
-const useGetTripParticipants = ({
+const useGetTripParticipantsAmount = ({
   networkId,
   tripId,
-}: UseGetTripParticipantsProps): UseGetTripParticipantsResponse => {
+}: UseGetTripParticipantsAmountProps): UseGetTripParticipantsAmountResponse => {
   const {
     data,
     isLoading,
@@ -36,4 +36,4 @@ const useGetTripParticipants = ({
   };
 };
 
-export default useGetTripParticipants;
+export default useGetTripParticipantsAmount;
