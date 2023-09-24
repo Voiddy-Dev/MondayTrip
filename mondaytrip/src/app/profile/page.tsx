@@ -65,7 +65,17 @@ export default function Profile() {
                                 </div>
                             </DialogTrigger>
                             <DialogContent className="sm:max-w-[425px]">
-                                {badge.description}
+                                {/* {badge.description} */}
+
+                                {/* display the badge.description and badge.createdAt */}
+                                <div className="flex flex-col">
+                                    <h3 className="text-base font-medium text-gray-600">Description</h3>
+                                    <p className="text-sm font-normal text-gray-400">{badge.description}</p>
+                                </div>
+                                <div className="flex flex-col">
+                                    <h3 className="text-base font-medium text-gray-600">Date</h3>
+                                    <p className="text-sm font-normal text-gray-400">{badge.createdAt.toDateString()}</p>
+                                </div>
                             </DialogContent>
                         </Dialog>
                     )
