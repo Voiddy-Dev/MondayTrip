@@ -274,6 +274,8 @@ contract TripPlanner {
         Hostel memory hostel = hostels[proposal.hostelId];
         hostel.status = HostelStatus.Booked;
         tripAcceptedProposal[_tripId] = proposal;
+        trip.information = TripInformation(proposal.startDate, proposal.endDate, hostel.location);
+        trips[_tripId] = trip;
     }
 
     function removeTripParticipant(uint256 _tripId, address _participant)
