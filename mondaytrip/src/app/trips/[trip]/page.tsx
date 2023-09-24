@@ -323,7 +323,7 @@ export default function Trip() {
 
                                     {alreadyApproved === false ? (<>
                                         {tripProposals?.map((proposal, index) => (
-                                            <div className="flex items-center space-x-2">
+                                            <div className="flex items-center space-x-2" key={`terms${index}`}>
                                                 { /* I want to check a checkbox if the index is in the `approvedProposals` array */}
                                                 <Checkbox id={`terms${index}`} />
                                                 <label
@@ -338,7 +338,7 @@ export default function Trip() {
                                     </>
                                     ) : (<>
                                         {tripProposals?.map((proposal, index) => (
-                                            <div className="flex items-center space-x-2">
+                                            <div className="flex items-center space-x-2"  key={`terms2${index}`}>
                                                 { /* I want to check a checkbox if the index is in the `approvedProposals` array */}
                                                 <Checkbox id={`terms${index}`} checked={approvedProposals.includes(index)} disabled />
                                                 <label
