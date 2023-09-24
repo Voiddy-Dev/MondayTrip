@@ -75,5 +75,6 @@ export type {
   UseWriteTransactionResponse,
   Proposal,
   Trip,
-  TripInformation
+  TripInformation,
+  Hostel
 };

@@ -426,6 +426,67 @@ const plannerAbi = [
     "inputs": [
       {
         "internalType": "uint256",
+        "name": "_proposalId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getProposal",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "id",
+            "type": "uint256"
+          },
+          {
+            "internalType": "string",
+            "name": "startDate",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "endDate",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "hostelId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "numberOfNights",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "totalPriceToPay",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "approvals",
+            "type": "uint256"
+          },
+          {
+            "internalType": "enum TripPlanner.ProposalStatus",
+            "name": "status",
+            "type": "uint8"
+          }
+        ],
+        "internalType": "struct TripPlanner.Proposal",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
         "name": "_tripId",
         "type": "uint256"
       }
