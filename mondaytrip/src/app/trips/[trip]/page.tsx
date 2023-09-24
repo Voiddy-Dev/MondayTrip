@@ -14,7 +14,8 @@ import {
 } from "@/components/ui/accordion"
 import { Proposal } from "./proposal";
 import ProposalDisp from "./proposaldisp";
-
+import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
 
 // Define the Tailwind CSS styles
 const tripContainer = `
@@ -77,6 +78,9 @@ export default function Trip() {
 
     const [tripProposals, setTripProposals] = useState<Proposal[] | undefined>(undefined);
     const [tripObj, setTripObj] = useState<TripObj | undefined>(undefined);
+
+    const [approvedProposals, setApprovedProposals] = useState<number[]>([]); // [0, 2]
+    const [alreadyApproved, setAlreadyApproved] = useState<boolean>(false);
 
     const params = useParams();
 
@@ -198,38 +202,6 @@ export default function Trip() {
 
     }, [params.trip]);
 
-    // make a trip varable that corresponds to `params.trip` (integer value) in the `listMockTrips` if it doesnt exist return a non existent trip error
-    // const tripObj = listMockTrips.find((trip) => trip.id === Number(params.trip));
-    // if (tripObj === undefined) {
-    //     return <h1>Not a trip</h1>
-    // }
-
-    // `useEffect` on `tripObj.tripinfo`
-    // if `tripObj.tripinfo` is not undefined then set the `bookedDataRange` and `bookedStartDate` to the values of `tripObj.tripinfo.startDate` and `tripObj.tripinfo.endDate`
-    // `bookedDataRange` and `bookedStartDate` are used to display the calendar
-    // useEffect(() => {
-    //     if (tripObj.tripinfo !== undefined) {
-    //         const startDate = new Date(tripObj.tripinfo.startDate);
-    //         const endDate = new Date(tripObj.tripinfo.endDate);
-
-    //         const daterange: DateRange = {
-    //             from: startDate,
-    //             to: endDate
-    //         }
-
-    //         setBookedDataRange(daterange);
-    //         setBookedStartDate(startDate);
-    //     }
-
-    //     if (tripObj.tripproposals !== undefined) {
-    //         const proposalList: StrProposal[] = [];
-    //         for (const strproposal of tripObj.tripproposals) {
-    //             proposalList.push({ ...strproposal });
-    //         }
-    //         setTripProposals(convertTripProposalsToDateObjects(proposalList));
-    //     }
-    // }, [tripObj]);
-
     const liHostels = [
         {
             hostelId: 1,
@@ -285,17 +257,18 @@ export default function Trip() {
         approvals: number;
     }
 
-    // useEffect(() => {
-    //     if (tripObj.tripproposals !== undefined) {
-    //         const proposalList: StrProposal[] = [];
-    //         for (const strproposal of tripObj.tripproposals) {
-    //             proposalList.push({ ...strproposal });
-    //         }
-    //         setTripProposals(convertTripProposalsToDateObjects(proposalList));
-    //     }
-    // }, [tripObj.tripproposals]);
+    const ALREADYAPPROVED = false;
+    const liapproved = [0, 2];
 
-    // find organizer name using `useEnsName`
+    useEffect(() => {
+        if (ALREADYAPPROVED) {
+            setApprovedProposals(liapproved);
+            setAlreadyApproved(true);
+        } else {
+            setApprovedProposals([]);
+            setAlreadyApproved(false);
+        }
+    }, [alreadyApproved]);
 
     const organizerEnsName = useEnsName({ address: tripObj?.organizer as `0x${string}` | undefined, chainId: 1 })
     const organizerdisplayname = organizerEnsName.data || (tripObj && tripObj.organizer);
@@ -332,8 +305,7 @@ export default function Trip() {
                                 <Accordion type="single" collapsible className="w-full">
                                     {tripProposals?.map((proposal) =>
                                         <ProposalDisp key={proposal.hostelId} proposal={proposal} />
-                                    )
-                                    }
+                                    )}
                                 </Accordion>
                                 // <></>
                             ) : (
@@ -345,6 +317,40 @@ export default function Trip() {
                                 </div>
                             )}
 
+                            <div className="flex flex-col space-y-2">
+                                <h2 className={tripHeader}>Your approvals</h2>
+                                <div className="flex flex-col space-y-2">
+
+                                    {alreadyApproved === false ? (<>
+                                        {tripProposals?.map((proposal, index) => (
+                                            <div className="flex items-center space-x-2">
+                                                { /* I want to check a checkbox if the index is in the `approvedProposals` array */}
+                                                <Checkbox id={`terms${index}`} />
+                                                <label
+                                                    htmlFor="terms2"
+                                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                                >
+                                                    {proposal.hostelName}
+                                                </label>
+                                            </div>
+                                        ))}
+                                        <Button>Appove</Button>
+                                    </>
+                                    ) : (<>
+                                        {tripProposals?.map((proposal, index) => (
+                                            <div className="flex items-center space-x-2">
+                                                { /* I want to check a checkbox if the index is in the `approvedProposals` array */}
+                                                <Checkbox id={`terms${index}`} checked={approvedProposals.includes(index)} disabled />
+                                                <label
+                                                    htmlFor="terms2"
+                                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                                >
+                                                    {proposal.hostelName}
+                                                </label>
+                                            </div>
+                                        ))}</>)}
+                                </div>
+                            </div>
 
 
                         </div>
