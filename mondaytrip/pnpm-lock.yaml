@@ -23,6 +23,9 @@ dependencies:
   '@types/react-dom':
     specifier: 18.2.7
     version: 18.2.7
+  '@wagmi/core':
+    specifier: ^1.4.2
+    version: 1.4.2(@types/react@18.2.22)(react@18.2.0)(typescript@5.2.2)(viem@1.12.1)
   '@web3modal/ethereum':
     specifier: ^2.7.1
     version: 2.7.1(@wagmi/core@1.4.2)(viem@1.12.1)
