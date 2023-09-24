@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.20;
 
-import {EnumerableSet} from "openzeppelin/utils/structs/EnumerableSet.sol";
-import {IERC20} from "openzeppelin/token/ERC20/IERC20.sol";
+import { EnumerableSet } from "openzeppelin/utils/structs/EnumerableSet.sol";
 
 contract TripPlanner {
     using EnumerableSet for EnumerableSet.AddressSet;
@@ -85,23 +84,35 @@ contract TripPlanner {
 
     modifier onlyValidAndActiveTrip(uint256 _tripId) {
         Trip memory trip = trips[_tripId];
-        require(_tripId < trips.length && trip.status == TripStatus.Planning, "Trip does not exist or is not active");
+        require(
+            _tripId < trips.length && trip.status == TripStatus.Planning,
+            "Trip does not exist or is not active"
+        );
         _;
     }
 
     modifier onlyValidHostel(uint256 _hostelId) {
         Hostel memory hostel = hostels[_hostelId];
         require(
-            _hostelId < hostels.length && hostel.status == HostelStatus.Active, "Hostel does not exist or is not active"
+            _hostelId < hostels.length && hostel.status == HostelStatus.Active,
+            "Hostel does not exist or is not active"
         );
         _;
     }
 
-    receive() external payable {}
+    receive() external payable { }
 
-    function createTrip(string memory _name, string memory _description, uint256 _maxPeople) external {
+    function createTrip(string memory _name, string memory _description, uint256 _maxPeople)
+        external
+    {
         Trip memory trip = Trip(
-            tripCount, _name, _description, _maxPeople, TripStatus.Planning, TripInformation("", "", ""), msg.sender
+            tripCount,
+            _name,
+            _description,
+            _maxPeople,
+            TripStatus.Planning,
+            TripInformation("", "", ""),
+            msg.sender
         );
         tripParticipants[tripCount].add(msg.sender);
         userTrips[msg.sender].push(tripCount);
@@ -155,36 +166,55 @@ contract TripPlanner {
         tripProposals[_tripId].push(proposal);
     }
 
-    function denyProposal(uint256 _tripId, uint256 _proposalId) external onlyValidAndActiveTrip(_tripId) {
+    function denyProposal(uint256 _tripId, uint256 _proposalId)
+        external
+        onlyValidAndActiveTrip(_tripId)
+    {
         Proposal memory proposal = tripProposals[_tripId][_proposalId];
         proposal.status = ProposalStatus.Denied;
         tripProposals[_tripId][_proposalId] = proposal;
     }
 
-    function payProposal(uint256 _tripId, uint256 _proposalId) external payable onlyValidAndActiveTrip(_tripId) {
-        require(tripParticipants[_tripId].contains(msg.sender), "Only trip participants can pay proposals");
+    function payProposal(uint256 _tripId, uint256 _proposalId)
+        external
+        payable
+        onlyValidAndActiveTrip(_tripId)
+    {
+        require(
+            tripParticipants[_tripId].contains(msg.sender),
+            "Only trip participants can pay proposals"
+        );
         Proposal memory proposal = tripProposals[_tripId][_proposalId];
         require(proposal.status == ProposalStatus.Accepted, "Can only pay for accepted proposals");
         proposal.status = ProposalStatus.Paid;
         tripProposals[_tripId][_proposalId] = proposal;
         Hostel memory hostel = hostels[proposal.hostelId];
-        (bool success,) = hostel.owner.call{value: proposal.totalPriceToPay}("");
+        (bool success,) = hostel.owner.call{ value: proposal.totalPriceToPay }("");
         require(success, "Payment failed");
     }
 
-    function inviteParticipant(uint256 _tripId, address _participant) external onlyValidAndActiveTrip(_tripId) {
+    function inviteParticipant(uint256 _tripId, address _participant)
+        external
+        onlyValidAndActiveTrip(_tripId)
+    {
         Trip memory trip = trips[_tripId];
         require(msg.sender == trip.organizer, "Only organizer can invite participants");
         tripInvitations[_tripId][_participant] = InvitationStatus.Pending;
     }
 
     function rejectInvitation(uint256 _tripId) external onlyValidAndActiveTrip(_tripId) {
-        require(tripInvitations[_tripId][msg.sender] == InvitationStatus.Pending, "No pending invitation for this trip");
+        require(
+            tripInvitations[_tripId][msg.sender] == InvitationStatus.Pending,
+            "No pending invitation for this trip"
+        );
         tripInvitations[_tripId][msg.sender] = InvitationStatus.Rejected;
     }
 
     function acceptInvitation(uint256 _tripId) external onlyValidAndActiveTrip(_tripId) {
-        require(tripInvitations[_tripId][msg.sender] == InvitationStatus.Pending, "No pending invitation for this trip");
+        require(
+            tripInvitations[_tripId][msg.sender] == InvitationStatus.Pending,
+            "No pending invitation for this trip"
+        );
         tripInvitations[_tripId][msg.sender] = InvitationStatus.Accepted;
         Trip memory trip = trips[_tripId];
         require(tripParticipants[_tripId].length() < trip.maxPeople, "Trip is full");
@@ -201,7 +231,10 @@ contract TripPlanner {
         trips[_tripId] = trip;
     }
 
-    function acceptProposal(uint256 _tripId, uint256 _proposalId) external onlyValidAndActiveTrip(_tripId) {
+    function acceptProposal(uint256 _tripId, uint256 _proposalId)
+        external
+        onlyValidAndActiveTrip(_tripId)
+    {
         Trip memory trip = trips[_tripId];
         require(msg.sender == trip.organizer, "Only organizer can accept proposals");
         Proposal memory proposal = tripProposals[_tripId][_proposalId];
@@ -212,7 +245,10 @@ contract TripPlanner {
         tripAcceptedProposal[_tripId] = proposal;
     }
 
-    function removeTripParticipant(uint256 _tripId, address _participant) external onlyValidAndActiveTrip(_tripId) {
+    function removeTripParticipant(uint256 _tripId, address _participant)
+        external
+        onlyValidAndActiveTrip(_tripId)
+    {
         tripParticipants[_tripId].remove(_participant);
     }
 
