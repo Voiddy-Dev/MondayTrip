@@ -9,8 +9,6 @@ export default function UserProfile({ address }: { address: `0x${string}` }) {
     const ensName = useEnsName({ address, chainId: 1 })
     const ensAvatar = useEnsAvatar({ name: ensName.data, chainId: 1 })
 
-    console.log(ensName);
-
     return (
         <div className="flex flex-horizontal space-x-2 items-center mb-2">
             <Avatar>
