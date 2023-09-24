@@ -100,7 +100,7 @@ export default function Notifications() {
     return (
         <div>
             <p>Subscribe to notifications</p>
-            <button onClick={handleTestNotification}>
+            <button onClick={subscribe}>
                 Send test notification
             </button>
         </div>
