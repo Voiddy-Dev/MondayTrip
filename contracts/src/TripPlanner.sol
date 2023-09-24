@@ -289,6 +289,10 @@ contract TripPlanner {
         return tripProposals[_tripId];
     }
 
+    function getProposal(uint256 _proposalId) external view returns (Proposal memory) {
+        return proposals[_proposalId];
+    }
+
     function getAcceptedProposal(uint256 _tripId) external view returns (Proposal memory) {
         return tripAcceptedProposal[_tripId];
     }
