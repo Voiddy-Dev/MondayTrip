@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.20;
 
-import { EnumerableSet } from "openzeppelin/utils/structs/EnumerableSet.sol";
-import { IERC20 } from "openzeppelin/token/ERC20/IERC20.sol";
+import {EnumerableSet} from "openzeppelin/utils/structs/EnumerableSet.sol";
+import {IERC20} from "openzeppelin/token/ERC20/IERC20.sol";
 
 contract TripPlanner {
     using EnumerableSet for EnumerableSet.AddressSet;
@@ -13,13 +13,13 @@ contract TripPlanner {
         Finished
     }
 
-    enum TripInvitation {
+    enum InvitationStatus {
         Pending,
         Accepted,
-        Denied
+        Rejected
     }
 
-    enum BookingStatus {
+    enum ProposalStatus {
         Proposed,
         Accepted,
         Denied,
@@ -37,26 +37,33 @@ contract TripPlanner {
         string description;
         uint256 maxPeople;
         TripStatus status;
+        TripInformation information;
         address organizer;
     }
 
-    struct Booking {
+    struct TripInformation {
+        string startDate;
+        string endDate;
+        string location;
+    }
+
+    struct Proposal {
         uint256 id;
         string startDate;
         string endDate;
         uint256 hostelId;
         uint256 numberOfNights;
         uint256 totalPriceToPay;
-        address paymentCurrency;
-        BookingStatus status;
+        ProposalStatus status;
     }
 
     struct Hostel {
         uint256 id;
         string name;
         string description;
-        uint256[] pricesPerNight;
-        address[] acceptedPaymentCurrencies;
+        string location;
+        string imageUrl;
+        uint256 pricePerNight;
         uint256 minPeople;
         uint256 maxPeople;
         address owner;
@@ -65,39 +72,37 @@ contract TripPlanner {
 
     uint256 public tripCount = 0;
     uint256 public hostelCount = 0;
-    uint256 public bookingCount = 0;
+    uint256 public proposalCount = 0;
 
     Trip[] public trips;
     Hostel[] public hostels;
-    Booking[] public bookings;
+    Proposal[] public proposals;
     mapping(address => uint256[]) userTrips;
     mapping(uint256 => EnumerableSet.AddressSet) tripParticipants;
-    mapping(uint256 => Booking[]) tripProposedBookings;
-    mapping(uint256 => Booking) tripAcceptedBooking;
+    mapping(uint256 => Proposal[]) tripProposals;
+    mapping(uint256 => Proposal) tripAcceptedProposal;
+    mapping(uint256 => mapping(address => InvitationStatus)) tripInvitations;
 
     modifier onlyValidAndActiveTrip(uint256 _tripId) {
         Trip memory trip = trips[_tripId];
-        require(
-            _tripId < trips.length && trip.status == TripStatus.Planning,
-            "Trip does not exist or is not active"
-        );
+        require(_tripId < trips.length && trip.status == TripStatus.Planning, "Trip does not exist or is not active");
         _;
     }
 
     modifier onlyValidHostel(uint256 _hostelId) {
         Hostel memory hostel = hostels[_hostelId];
         require(
-            _hostelId < hostels.length && hostel.status == HostelStatus.Active,
-            "Hostel does not exist or is not active"
+            _hostelId < hostels.length && hostel.status == HostelStatus.Active, "Hostel does not exist or is not active"
         );
         _;
     }
 
-    function createTrip(string memory _name, string memory _description, uint256 _maxPeople)
-        external
-    {
-        Trip memory trip =
-            Trip(tripCount, _name, _description, _maxPeople, TripStatus.Planning, msg.sender);
+    receive() external payable {}
+
+    function createTrip(string memory _name, string memory _description, uint256 _maxPeople) external {
+        Trip memory trip = Trip(
+            tripCount, _name, _description, _maxPeople, TripStatus.Planning, TripInformation("", "", ""), msg.sender
+        );
         tripParticipants[tripCount].add(msg.sender);
         userTrips[msg.sender].push(tripCount);
         trips.push(trip);
@@ -107,18 +112,19 @@ contract TripPlanner {
     function createHostel(
         string calldata _name,
         string calldata _description,
-        uint256[] calldata _pricesPerNight,
-        address[] calldata _acceptedPaymentCurrencies,
+        string calldata _location,
+        string calldata _imageUrl,
+        uint256 _pricePerNight,
         uint256 _maxPeople,
         uint256 _minPeople
     ) public {
-        require(_pricesPerNight.length == _acceptedPaymentCurrencies.length, "Invalid input");
         Hostel memory hostel = Hostel({
             id: hostelCount,
             name: _name,
             description: _description,
-            pricesPerNight: _pricesPerNight,
-            acceptedPaymentCurrencies: _acceptedPaymentCurrencies,
+            location: _location,
+            imageUrl: _imageUrl,
+            pricePerNight: _pricePerNight,
             minPeople: _minPeople,
             maxPeople: _maxPeople,
             owner: msg.sender,
@@ -128,99 +134,90 @@ contract TripPlanner {
         ++hostelCount;
     }
 
-    function proposeBooking(
+    function proposeProposal(
         uint256 _tripId,
         string calldata _startDate,
         string calldata _endDate,
         uint256 _numberOfNights,
-        address _paymentCurrency,
         uint256 _hostelId
     ) external onlyValidAndActiveTrip(_tripId) onlyValidHostel(_hostelId) {
         Hostel memory hostel = hostels[_hostelId];
-        uint256 totalPriceToPay = hostel.pricesPerNight[_numberOfNights] * _numberOfNights;
-        Booking memory booking = Booking({
-            id: bookingCount,
+        uint256 totalPriceToPay = hostel.pricePerNight * _numberOfNights;
+        Proposal memory proposal = Proposal({
+            id: proposalCount,
             totalPriceToPay: totalPriceToPay,
             startDate: _startDate,
             endDate: _endDate,
             numberOfNights: _numberOfNights,
-            paymentCurrency: _paymentCurrency,
             hostelId: _hostelId,
-            status: BookingStatus.Proposed
+            status: ProposalStatus.Proposed
         });
-        tripProposedBookings[_tripId].push(booking);
+        tripProposals[_tripId].push(proposal);
     }
 
-    function denyBooking(uint256 _tripId, uint256 _bookingId)
-        external
-        onlyValidAndActiveTrip(_tripId)
-    {
-        Booking memory booking = tripProposedBookings[_tripId][_bookingId];
-        booking.status = BookingStatus.Denied;
-        tripProposedBookings[_tripId][_bookingId] = booking;
+    function denyProposal(uint256 _tripId, uint256 _proposalId) external onlyValidAndActiveTrip(_tripId) {
+        Proposal memory proposal = tripProposals[_tripId][_proposalId];
+        proposal.status = ProposalStatus.Denied;
+        tripProposals[_tripId][_proposalId] = proposal;
     }
 
-    function payBooking(uint256 _tripId, uint256 _bookingId)
-        external
-        onlyValidAndActiveTrip(_tripId)
-    {
-        require(
-            tripParticipants[_tripId].contains(msg.sender),
-            "Only trip participants can pay bookings"
-        );
-        Booking memory booking = tripProposedBookings[_tripId][_bookingId];
-        require(booking.status == BookingStatus.Accepted, "Can only pay for accepted bookings");
-        booking.status = BookingStatus.Paid;
-        tripProposedBookings[_tripId][_bookingId] = booking;
-        Hostel memory hostel = hostels[booking.hostelId];
-        IERC20 token = IERC20(booking.paymentCurrency);
-        token.transferFrom(msg.sender, hostel.owner, booking.totalPriceToPay);
+    function payProposal(uint256 _tripId, uint256 _proposalId) external payable onlyValidAndActiveTrip(_tripId) {
+        require(tripParticipants[_tripId].contains(msg.sender), "Only trip participants can pay proposals");
+        Proposal memory proposal = tripProposals[_tripId][_proposalId];
+        require(proposal.status == ProposalStatus.Accepted, "Can only pay for accepted proposals");
+        proposal.status = ProposalStatus.Paid;
+        tripProposals[_tripId][_proposalId] = proposal;
+        Hostel memory hostel = hostels[proposal.hostelId];
+        (bool success,) = hostel.owner.call{value: proposal.totalPriceToPay}("");
+        require(success, "Payment failed");
     }
 
-    function addTripParticipant(uint256 _tripId, address _participant)
-        external
-        onlyValidAndActiveTrip(_tripId)
-    {
+    function inviteParticipant(uint256 _tripId, address _participant) external onlyValidAndActiveTrip(_tripId) {
+        Trip memory trip = trips[_tripId];
+        require(msg.sender == trip.organizer, "Only organizer can invite participants");
+        tripInvitations[_tripId][_participant] = InvitationStatus.Pending;
+    }
+
+    function rejectInvitation(uint256 _tripId) external onlyValidAndActiveTrip(_tripId) {
+        require(tripInvitations[_tripId][msg.sender] == InvitationStatus.Pending, "No pending invitation for this trip");
+        tripInvitations[_tripId][msg.sender] = InvitationStatus.Rejected;
+    }
+
+    function acceptInvitation(uint256 _tripId) external onlyValidAndActiveTrip(_tripId) {
+        require(tripInvitations[_tripId][msg.sender] == InvitationStatus.Pending, "No pending invitation for this trip");
+        tripInvitations[_tripId][msg.sender] = InvitationStatus.Accepted;
         Trip memory trip = trips[_tripId];
         require(tripParticipants[_tripId].length() < trip.maxPeople, "Trip is full");
-        require(msg.sender == trip.organizer, "Trip is exclusive");
-        tripParticipants[_tripId].add(_participant);
-        trips[_tripId] = trip;
+        tripParticipants[_tripId].add(msg.sender);
     }
 
     function finishTrip(uint256 _tripId) external onlyValidAndActiveTrip(_tripId) {
         Trip memory trip = trips[_tripId];
         trip.status = TripStatus.Finished;
-        Booking memory booking = tripAcceptedBooking[_tripId];
-        Hostel memory hostel = hostels[booking.hostelId];
+        Proposal memory proposal = tripAcceptedProposal[_tripId];
+        Hostel memory hostel = hostels[proposal.hostelId];
         hostel.status = HostelStatus.Active;
-        hostels[booking.hostelId] = hostel;
+        hostels[proposal.hostelId] = hostel;
         trips[_tripId] = trip;
     }
 
-    function acceptBooking(uint256 _tripId, uint256 _bookingId)
-        external
-        onlyValidAndActiveTrip(_tripId)
-    {
+    function acceptProposal(uint256 _tripId, uint256 _proposalId) external onlyValidAndActiveTrip(_tripId) {
         Trip memory trip = trips[_tripId];
-        require(msg.sender == trip.organizer, "Only organizer can accept bookings");
-        Booking memory booking = tripProposedBookings[_tripId][_bookingId];
-        booking.status = BookingStatus.Accepted;
+        require(msg.sender == trip.organizer, "Only organizer can accept proposals");
+        Proposal memory proposal = tripProposals[_tripId][_proposalId];
+        proposal.status = ProposalStatus.Accepted;
         trip.status = TripStatus.Booked;
-        Hostel memory hostel = hostels[booking.hostelId];
+        Hostel memory hostel = hostels[proposal.hostelId];
         hostel.status = HostelStatus.Booked;
-        tripAcceptedBooking[_tripId] = booking;
+        tripAcceptedProposal[_tripId] = proposal;
     }
 
-    function removeTripParticipant(uint256 _tripId, address _participant)
-        external
-        onlyValidAndActiveTrip(_tripId)
-    {
+    function removeTripParticipant(uint256 _tripId, address _participant) external onlyValidAndActiveTrip(_tripId) {
         tripParticipants[_tripId].remove(_participant);
     }
 
-    function getTripProposedBookings(uint256 _tripId) external view returns (Booking[] memory) {
-        return tripProposedBookings[_tripId];
+    function getTripProposals(uint256 _tripId) external view returns (Proposal[] memory) {
+        return tripProposals[_tripId];
     }
 
     function getTripParticipants(uint256 _tripId) external view returns (address[] memory) {
