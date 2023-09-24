@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { useAccount, usePublicClient, useSignMessage } from "wagmi";
 
+
 import {
     useInitWeb3InboxClient,
     useManageSubscription,
@@ -10,6 +11,7 @@ import {
 } from "@web3inbox/widget-react";
 import "@web3inbox/widget-react/dist/compiled.css";
 
+import { Button } from "@/components/ui/button"
 import useSendNotification from "../../utils/useSendNotification";
 import { useInterval } from "usehooks-ts";
 
@@ -50,17 +52,17 @@ export default function Notifications() {
     const { handleSendNotification, isSending } = useSendNotification();
     const [lastBlock, setLastBlock] = useState<string>();
     const [isBlockNotificationEnabled, setIsBlockNotificationEnabled] =
-      useState(true);
-  
+        useState(true);
+
     const signMessage = useCallback(
-      async (message: string) => {
-        const res = await signMessageAsync({
-          message,
-        });
-  
-        return res as string;
-      },
-      [signMessageAsync]
+        async (message: string) => {
+            const res = await signMessageAsync({
+                message,
+            });
+
+            return res as string;
+        },
+        [signMessageAsync]
     );
 
     // We need to set the account as soon as the user is connected
@@ -72,15 +74,15 @@ export default function Notifications() {
     const handleRegistration = useCallback(async () => {
         if (!account) return;
         try {
-        await registerIdentity(signMessage);
+            await registerIdentity(signMessage);
         } catch (registerIdentityError) {
-        console.error({ registerIdentityError });
+            console.error({ registerIdentityError });
         }
     }, [signMessage, registerIdentity, account]);
 
     useEffect(() => {
         if (!identityKey) {
-        handleRegistration();
+            handleRegistration();
         }
     }, [handleRegistration, identityKey]);
 
@@ -96,13 +98,37 @@ export default function Notifications() {
         });
     }, [handleSendNotification]);
 
+    // return (
+    //     <div>
+    //         <p>Subscribe to notifications</p>
+    //         <Button onClick={subscribe}>
+    //             Subscribe
+    //         </Button>
+    //         <p>{isSubscribed}</p>
+    //     </div>
+    // )
+
+    // add a button in the middle of the page that says "subscribe to notifications" and when you click it, it subscribes you to notifications
     return (
-        <div>
-            <p>Subscribe to notifications</p>
-            <button onClick={subscribe}>
-                Subscribe
-            </button>
-            <p>{isSubscribed}</p>
+
+        <div className="flex flex-col justify-center items-center h-screen" >
+            <h1 className="text-4xl font-bold">Notifications</h1>
+            {account ? (
+                <>
+                    <p className="text-xl font-medium text-gray-600">Subscribe to notifications</p>
+                    <hr className="my-2" />
+                    <Button onClick={subscribe}>
+                        Subscribe
+                    </Button>
+                    <p>{isSubscribed}</p>
+                </>
+            ) : (
+                <>
+                    <p className="text-xl font-medium text-gray-600">Connect your wallet to subscribe!</p>
+                </>
+            )
+            }
+
         </div>
     )
 }
