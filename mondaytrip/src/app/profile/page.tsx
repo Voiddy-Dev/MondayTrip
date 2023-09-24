@@ -9,18 +9,20 @@ import {
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
+import { useAccount, useNetwork } from 'wagmi';
+import { useGetUserTrips } from '@/hooks';
+import { lineaTestnet } from 'wagmi/chains';
 
 export default function Profile() {
-    const fakeProfile = {
-        name: "Satoshi Nakamoto",
-    }
+    const { address } = useAccount();
+    const { chain } = useNetwork();
+    const { trips } = useGetUserTrips({
+        networkId: chain?.id ? chain.id : lineaTestnet.id,
+        userAddress: address ? address : "0x",
+    });
 
     const liBadges = [
         {
@@ -35,17 +37,17 @@ export default function Profile() {
         }
     ];
 
-
-    const [profile, setProfile] = useState(fakeProfile);
-
-    useEffect(() => {
-        setProfile(fakeProfile);
-    }, [fakeProfile]);
-
     return (
         <div className="flex flex-col justify-center items-center h-screen">
             <h1 className="text-4xl font-bold">Profile</h1>
-            <p className="text-xl font-medium text-gray-600">{fakeProfile.name}</p>
+            <Avatar>
+                <AvatarImage
+                    src={`https://noun-api.com/beta/pfp?name=${address}`}
+                    alt={`Profile picture of ${address}`}
+                />
+                <AvatarFallback>CN</AvatarFallback>
+            </Avatar>
+            <p className="text-xl font-medium text-gray-600">{address}</p>
             <hr className="my-2" />
             <h2 className="text-2xl font-bold mb-2">Badges</h2>
             <div className="flex flex-horizontal space-x-2 items-center mb-2">

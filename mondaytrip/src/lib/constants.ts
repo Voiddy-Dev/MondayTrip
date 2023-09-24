@@ -1,5 +1,5 @@
 
-const plannerAddress = '0x405e677597A5d6B4Ad6f4749a3d40a5A07aBc5FF';
+const plannerAddress = '0x5403DB675e20F499CEe9E4373127d3231da1db7A';
 
 export {
   plannerAddress,

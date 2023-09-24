@@ -4,7 +4,7 @@ import { plannerAddress } from '../lib/constants';
 import { Hostel } from '@/lib/types';
 
 interface UseGetHostelResponse {
-  trips: Hostel | never[];
+  hostel: Hostel | undefined;
   isLoading: boolean;
 }
 
@@ -32,7 +32,7 @@ const useGetHostel = ({
   });
 
   return {
-    trips: data ?? [],
+    hostel: data ?? undefined,
     isLoading,
   };
 };

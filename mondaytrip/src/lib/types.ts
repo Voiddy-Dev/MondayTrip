@@ -76,5 +76,6 @@ export type {
   Proposal,
   Trip,
   TripInformation,
-  Hostel
+  Hostel,
+  TripStatus
 };

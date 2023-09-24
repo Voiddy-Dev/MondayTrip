@@ -14,7 +14,7 @@ import useGetHostel from "./use-get-hostel";
 import useGetProposal from "./use-get-proposal";
 import useGetTrip from "./use-get-trip";
 import useGetTripParticipantsAmount from "./use-get-trip-participants-amount";
-import useGetTripParticipants from "./use-get-trip-participants-amount";
+import useGetTripParticipants from "./use-get-trip-participants";
 import useGetTripProposals from "./use-get-trip-proposals";
 import useGetUserTrips from "./use-get-user-trips";
 import useInviteParticipant from "./use-invite-participant";

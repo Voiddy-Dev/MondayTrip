@@ -4,7 +4,7 @@ import { useParams } from "next/navigation"
 import { Calendar } from "@/components/ui/calendar"
 import { DateRange } from 'react-day-picker';
 import UserProfile from "./userprofile";
-import { useEnsName } from 'wagmi'
+import { useEnsName, useNetwork } from 'wagmi'
 import { useEffect, useState } from "react";
 import {
     Accordion,
@@ -12,10 +12,12 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from "@/components/ui/accordion"
-import { Proposal } from "./proposal";
 import ProposalDisp from "./proposaldisp";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+import { Proposal, Trip } from "@/lib/types";
+import { useCreateProposal, useGetAcceptedProposal, useGetAllHostels, useGetTrip, useGetTripParticipants, useGetTripProposals, useInviteParticipant } from "@/hooks";
+import { lineaTestnet } from "wagmi/chains";
 
 // Define the Tailwind CSS styles
 const tripContainer = `
@@ -57,150 +59,41 @@ const tripDetail = `
 `;
 
 export default function Trip() {
-    interface TripObj {
-        id: number;
-        name: string;
-        description: string;
-        maxPeople: number;
-        status: string;
-        organizer: string;
-        tripinfo: {
-            location: string;
-            startDate: string;
-            endDate: string;
-        };
-        tripproposals: StrProposal[];
-
-    }
-
     const [bookedDataRange, setBookedDataRange] = useState<DateRange | undefined>(undefined);
     const [bookedStartDate, setBookedStartDate] = useState<Date | undefined>(undefined);
-
-    const [tripProposals, setTripProposals] = useState<Proposal[] | undefined>(undefined);
-    const [tripObj, setTripObj] = useState<TripObj | undefined>(undefined);
-
-    const [approvedProposals, setApprovedProposals] = useState<number[]>([]); // [0, 2]
     const [alreadyApproved, setAlreadyApproved] = useState<boolean>(false);
-
+    const [newParticipant, setNewParticipant] = useState("");
+    const { chain } = useNetwork();
     const params = useParams();
+    const { trip } = useGetTrip({
+        networkId: chain?.id ? chain.id : lineaTestnet.id,
+        _tripId: Number(params.trip)
+    });
 
-    const listOfTravelers = [
-        {
-            address: "0x123",
-        },
-        {
-            address: "0xbA8A669738F217059a312e3F11c9b2E7344605c5",
-        },
-        {
-            address: "0x789",
-        },
-    ]
+    const { participants } = useGetTripParticipants({
+        networkId: chain?.id ? chain.id : lineaTestnet.id,
+        tripId: Number(params.trip)
+    });
 
-    const listMockTrips = [
-        {
-            id: 1,
-            name: "Trip to the moon",
-            description: "A trip to the moon",
-            maxPeople: 10,
-            status: "Planning",
-            organizer: "0x123",
-            tripinfo: {
-                location: "Moon",
-                startDate: "2021-10-10",
-                endDate: "2021-10-20",
-            },
-            tripproposals: [
-                {
-                    hostelId: 1,
-                    startDate: "2021-10-10",
-                    endDate: "2021-10-20",
-                    totalPriceToPay: 100,
-                    approvals: 5,
-                },
-                {
-                    hostelId: 2,
-                    startDate: "2021-12-10",
-                    endDate: "2022-10-20",
-                    totalPriceToPay: 200,
-                    approvals: 5,
-                },
-                {
-                    hostelId: 3,
-                    startDate: "2023-10-10",
-                    endDate: "2023-10-20",
-                    totalPriceToPay: 300,
-                    approvals: 5,
-                }
-            ]
-        },
-        {
-            id: 2,
-            name: "Trip to the mars",
-            description: "A trip to the mars",
-            maxPeople: 10,
-            status: "Booked",
-            organizer: "0xbA8A669738F217059a312e3F11c9b2E7344605c5",
-            tripinfo: {
-                location: "Mars",
-                startDate: "2021-10-10",
-                endDate: "2021-10-20",
-            },
-            tripproposals: [
-                {
-                    hostelId: 1,
-                    startDate: "2021-10-10",
-                    endDate: "2021-10-20",
-                    totalPriceToPay: 100,
-                    approvals: 5,
-                },
-                {
-                    hostelId: 2,
-                    startDate: "2021-12-10",
-                    endDate: "2022-10-20",
-                    totalPriceToPay: 200,
-                    approvals: 3,
-                },
-                {
-                    hostelId: 3,
-                    startDate: "2023-10-10",
-                    endDate: "2023-10-20",
-                    totalPriceToPay: 300,
-                    approvals: 2,
-                }
-            ]
-        },
-    ]
+    const { proposals: tripProposals } = useGetTripProposals({
+        networkId: chain?.id ? chain.id : lineaTestnet.id,
+        tripId: Number(params.trip)
+    })
 
-    // use a useEffect to get the trip data from the backend
+    const { proposal: acceptedProposal } = useGetAcceptedProposal({
+        networkId: chain?.id ? chain.id : lineaTestnet.id,
+        tripId: Number(params.trip)
+    })
 
-    useEffect(() => {
-        const o = listMockTrips.find((trip) => trip.id === Number(params.trip));
-        setTripObj(o);
+    const { hostels } = useGetAllHostels({
+        networkId: chain?.id ? chain.id : lineaTestnet.id,
+    })
 
-        if (o !== undefined) {
-            if (o.tripinfo !== undefined) {
-                const startDate = new Date(o.tripinfo.startDate);
-                const endDate = new Date(o.tripinfo.endDate);
-
-                const daterange: DateRange = {
-                    from: startDate,
-                    to: endDate
-                }
-
-                setBookedDataRange(daterange);
-                setBookedStartDate(startDate);
-            }
-
-            if (o.tripproposals !== undefined) {
-                const proposalList: StrProposal[] = [];
-                for (const strproposal of o.tripproposals) {
-                    proposalList.push({ ...strproposal });
-                }
-                setTripProposals(convertTripProposalsToDateObjects(proposalList));
-            }
-        }
-
-    }, [params.trip]);
+    const { sendTransaction: inviteParticipant } = useInviteParticipant({
+        networkId: chain?.id ? chain.id : lineaTestnet.id,
+        tripId: Number(params.trip),
+        participant: newParticipant
+    })
 
     const liHostels = [
         {
@@ -223,59 +116,12 @@ export default function Trip() {
         }
     ]
 
-    const convertStrProposalToProposal = (proposal: StrProposal): Proposal => {
-        const startDate = new Date(proposal.startDate);
-        const endDate = new Date(proposal.endDate);
-
-        const hostelname = liHostels.find((hostel) => hostel.hostelId === proposal.hostelId)?.hostelName as string;
-        const hosteldescription = liHostels.find((hostel) => hostel.hostelId === proposal.hostelId)?.hostelDescription as string;
-        const hostellocation = liHostels.find((hostel) => hostel.hostelId === proposal.hostelId)?.hostelLocation as string;
-
-        return {
-            ...proposal,
-            hostelName: hostelname,
-            hostelDescription: hosteldescription,
-            hostelLocation: hostellocation,
-            startDate,
-            endDate,
-            dateRange: {
-                from: startDate,
-                to: endDate,
-            },
-        };
-    };
-
-    const convertTripProposalsToDateObjects = (tripProposals: StrProposal[]): Proposal[] => {
-        return tripProposals.map(convertStrProposalToProposal);
-    };
-
-    interface StrProposal {
-        hostelId: number;
-        startDate: string;
-        endDate: string;
-        totalPriceToPay: number;
-        approvals: number;
-    }
-
-    const ALREADYAPPROVED = false;
-    const liapproved = [0, 2];
-
-    useEffect(() => {
-        if (ALREADYAPPROVED) {
-            setApprovedProposals(liapproved);
-            setAlreadyApproved(true);
-        } else {
-            setApprovedProposals([]);
-            setAlreadyApproved(false);
-        }
-    }, [alreadyApproved]);
-
-    const organizerEnsName = useEnsName({ address: tripObj?.organizer as `0x${string}` | undefined, chainId: 1 })
-    const organizerdisplayname = organizerEnsName.data || (tripObj && tripObj.organizer);
+    const organizerEnsName = useEnsName({ address: trip?.organizer as `0x${string}` | undefined, chainId: 1 })
+    const organizerDisplayName = organizerEnsName.data || (trip && trip.organizer);
 
     return (
         <>
-            {tripObj === undefined ? (
+            {trip === undefined ? (
                 <h1>Not a trip</h1>
             ) : (
                 <>
@@ -283,35 +129,35 @@ export default function Trip() {
                         <div className={tripInfo}>
                             {/* add a header with the name, description and trip status - make it as a vertical block */}
                             <div className="flex flex-col mb-4">
-                                <h2 className={tripHeader}>{tripObj.name}</h2>
-                                <h3 className={tripSubheader}>Where: {tripObj.tripinfo.location}</h3>
-                                <p className={tripDetail}>Organized by: {organizerdisplayname}</p>
+                                <h2 className={tripHeader}>{trip.name}</h2>
+                                <h3 className={tripSubheader}>Where: {trip.information.location === '' ? "To be determined" : trip.information.location}</h3>
+                                <p className={tripDetail}>Organized by: {trip.organizer}</p>
                             </div>
 
                             <TripStatus
-                                status={tripObj.status as "Planning" | "Booked" | "Finished"}
+                                status={trip.status}
                             />
 
                             <hr className="my-2" />
 
                             <div className="flex flex-col">
                                 <h3 className={tripSubheader}>Description</h3>
-                                <p className={tripDetail}>{tripObj.description}</p>
+                                <p className={tripDetail}>{trip.description}</p>
                             </div>
 
                             <hr className="my-2" />
 
-                            {tripProposals !== undefined && tripObj.status === "Planning" ? (
+                            {tripProposals !== undefined && trip.status === 0 ? (
                                 <Accordion type="single" collapsible className="w-full">
                                     {tripProposals?.map((proposal) =>
-                                        <ProposalDisp key={proposal.hostelId} proposal={proposal} />
+                                        <ProposalDisp key={Number(proposal.hostelId)} proposal={proposal} />
                                     )}
                                 </Accordion>
                                 // <></>
                             ) : (
                                 <div className="flex flex-col">
                                     <h3 className={tripSubheader}>Dates</h3>
-                                    {tripObj.tripinfo !== undefined && bookedDataRange && bookedStartDate ? (
+                                    {trip.information !== undefined && bookedDataRange && bookedStartDate ? (
                                         <Calendar className="hw-full mx-auto" selected={bookedDataRange} defaultMonth={bookedStartDate} />
                                     ) : (<></>)}
                                 </div>
@@ -323,29 +169,29 @@ export default function Trip() {
 
                                     {alreadyApproved === false ? (<>
                                         {tripProposals?.map((proposal, index) => (
-                                            <div className="flex items-center space-x-2" key={`terms${index}`}>
+                                            <div key={index} className="flex items-center space-x-2">
                                                 { /* I want to check a checkbox if the index is in the `approvedProposals` array */}
                                                 <Checkbox id={`terms${index}`} />
                                                 <label
                                                     htmlFor="terms2"
                                                     className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                                                 >
-                                                    {proposal.hostelName}
+                                                    {hostels[Number(proposal.hostelId)].name}
                                                 </label>
                                             </div>
                                         ))}
-                                        <Button>Appove</Button>
+                                        <Button>Approve</Button>
                                     </>
                                     ) : (<>
                                         {tripProposals?.map((proposal, index) => (
-                                            <div className="flex items-center space-x-2"  key={`terms2${index}`}>
+                                            <div key={index} className="flex items-center space-x-2">
                                                 { /* I want to check a checkbox if the index is in the `approvedProposals` array */}
-                                                <Checkbox id={`terms${index}`} checked={approvedProposals.includes(index)} disabled />
+                                                <Checkbox id={`terms${index}`} checked={proposal.approvals > 0} disabled />
                                                 <label
                                                     htmlFor="terms2"
                                                     className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                                                 >
-                                                    {proposal.hostelName}
+                                                    {hostels[Number(proposal.hostelId)].name}
                                                 </label>
                                             </div>
                                         ))}</>)}
@@ -361,9 +207,11 @@ export default function Trip() {
                         <div className={tripInfo}>
                             <h2 className={tripHeader}>Travelers</h2>
                             <hr className="my-2" />
-                            {listOfTravelers.map((user) => (
-                                <UserProfile key={user.address} address={user.address as `0x${string}`} />
+                            {participants.map((user) => (
+                                <UserProfile key={user} address={user as `0x${string}`} />
                             ))}
+                            <input type="text" value={newParticipant} onChange={(e) => setNewParticipant(e.target.value)} />
+                            <button onClick={() => inviteParticipant()}>Invite a new participant</button>
                         </div>
                     </div>
 

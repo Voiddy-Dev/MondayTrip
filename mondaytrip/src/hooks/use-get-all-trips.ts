@@ -4,7 +4,7 @@ import { plannerAddress } from '../lib/constants';
 import { Trip } from '@/lib/types';
 
 interface UseGetAllTripsResponse {
-  proposals: readonly Trip[];
+  trips: readonly Trip[];
   isLoading: boolean;
 }
 
@@ -27,7 +27,7 @@ const useGetAllTrips = ({
   });
 
   return {
-    proposals: data ?? [],
+    trips: data ?? [],
     isLoading,
   };
 };

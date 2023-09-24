@@ -4,19 +4,19 @@ import { plannerAddress } from '../lib/constants';
 import { Trip } from '@/lib/types';
 
 interface UseGetTripResponse {
-  trips: Trip | never[];
+  trip: Trip | undefined;
   isLoading: boolean;
 }
 
 interface UseGetTripProps {
   networkId: number;
-  tripId: number;
+  _tripId: number;
 }
 
 
 const useGetTrip = ({
   networkId,
-  tripId,
+  _tripId,
 }: UseGetTripProps): UseGetTripResponse => {
   const {
     data,
@@ -27,12 +27,12 @@ const useGetTrip = ({
     chainId: networkId,
     functionName: 'getTrip',
     args: [
-      BigInt(tripId)
+      BigInt(_tripId)
     ],
   });
 
   return {
-    trips: data ?? [],
+    trip: data ?? undefined,
     isLoading,
   };
 };

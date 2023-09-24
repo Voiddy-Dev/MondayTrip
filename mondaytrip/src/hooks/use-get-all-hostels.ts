@@ -4,7 +4,7 @@ import { plannerAddress } from '../lib/constants';
 import { Hostel } from '@/lib/types';
 
 interface UseGetAllHostelsResponse {
-  proposals: readonly Hostel[];
+  hostels: readonly Hostel[];
   isLoading: boolean;
 }
 
@@ -26,7 +26,7 @@ const useGetAllHostels = ({
   });
 
   return {
-    proposals: data ?? [],
+    hostels: data ?? [],
     isLoading,
   };
 };

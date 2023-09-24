@@ -20,6 +20,7 @@ const useGetUserTrips = ({
   const {
     data,
     isLoading,
+    error
   } = useContractRead({
     address: plannerAddress,
     abi: plannerAbi,
@@ -29,6 +30,12 @@ const useGetUserTrips = ({
       userAddress as `0x${string}`
     ],
   });
+
+  console.log(data)
+
+  if (error) {
+    console.error(error);
+  }
 
   return {
     trips: data ?? [],
