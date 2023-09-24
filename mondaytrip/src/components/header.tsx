@@ -1,5 +1,4 @@
 import { Web3Button } from "@web3modal/react"
-import { useAccount, useEnsName } from "wagmi"
 
 export default function Header() {
     return (
