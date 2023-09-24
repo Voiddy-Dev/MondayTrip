@@ -15,12 +15,12 @@ export default function UserProfile({ address }: { address: `0x${string}` }) {
         <div className="flex flex-horizontal space-x-2 items-center">
             <Avatar>
                 <AvatarImage
-                    src={`https://noun-api.com/beta/pfp?name=${address}`}
+                    src={ensAvatar.data || `https://noun-api.com/beta/pfp?name=${address}`}
                     alt={`Profile picture of ${address}`}
                 />
                 <AvatarFallback>CN</AvatarFallback>
             </Avatar>
-            <p>{address}</p>
+            <p>{ensName.data || address}</p>
         </div>
     )
 }
