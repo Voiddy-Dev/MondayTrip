@@ -51,7 +51,7 @@ export default function Profile() {
             <div className="flex flex-horizontal space-x-2 items-center mb-2">
                 {liBadges.map((badge, index) => {
                     return (
-                        <Dialog>
+                        <Dialog key={index}>
                             <DialogTrigger asChild>
                                 <div className="flex flex-col items-center">
                                     <Avatar id={`avatar-${index}`}>
