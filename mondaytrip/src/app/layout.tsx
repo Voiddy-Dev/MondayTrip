@@ -4,12 +4,13 @@ import { Inter } from 'next/font/google'
 import Header from '@/components/header'
 
 import { RainbowKitProvider } from '@rainbow-me/rainbowkit'
-import { useEnsAvatar, useEnsName } from 'wagmi'
 
 import { EthereumClient, w3mConnectors, w3mProvider } from '@web3modal/ethereum'
 import { Web3Modal } from '@web3modal/react'
 import { configureChains, createConfig, WagmiConfig } from 'wagmi'
 import { arbitrum, mainnet, polygon } from 'wagmi/chains'
+
+import { XMTPProvider } from "@xmtp/react-sdk";
 
 const chains = [arbitrum, mainnet, polygon]
 const projectId = '1faa997954218e594cdaca009f3adf6e'
@@ -35,8 +36,10 @@ export default function RootLayout({
           <body>
             <WagmiConfig config={wagmiConfig}>
               <RainbowKitProvider chains={chains}>
-                <Header />
-                <div>{children}</div>
+                <XMTPProvider>
+                  <Header />
+                  <div>{children}</div>
+                </XMTPProvider>
               </RainbowKitProvider>
             </WagmiConfig>
             <Web3Modal projectId={projectId} ethereumClient={ethereumClient} />

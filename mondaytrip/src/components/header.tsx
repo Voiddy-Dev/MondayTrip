@@ -8,6 +8,7 @@ export default function Header() {
             </div>
             <div className="flex items-center">
                 <a href="#" className="mr-4 text-sm font-medium text-gray-700 hover:text-gray-900">Home</a>
+                <a href="/messages" className="mr-4 text-sm font-medium text-gray-700 hover:text-gray-900">Messages</a>
                 <a href="/explore" className="mr-4 text-sm font-medium text-gray-700 hover:text-gray-900">Explore</a>
                 <a href="/trips" className="mr-4 text-sm font-medium text-gray-700 hover:text-gray-900">My Trips</a>
             </div>
