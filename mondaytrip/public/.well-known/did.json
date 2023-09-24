@@ -1,1 +1,35 @@
-{"@context":["https://www.w3.org/ns/did/v1","https://w3id.org/security/suites/jws-2020/v1"],"id":"did:web:mondaytrip.vercel.app","verificationMethod":[{"id":"did:web:mondaytrip.vercel.app#wc-notify-subscribe-key","type":"JsonWebKey2020","controller":"did:web:mondaytrip.vercel.app","publicKeyJwk":{"kty":"OKP","crv":"X25519","x":"hnuteTTPRmQvpWbub-v1f2UvWyp8txd-5PLYicLAXQE"}},{"id":"did:web:mondaytrip.vercel.app#wc-notify-authentication-key","type":"JsonWebKey2020","controller":"did:web:mondaytrip.vercel.app","publicKeyJwk":{"kty":"OKP","crv":"Ed25519","x":"Mmor1vS51vdKJiKK5dQNJyDWAET-NEq6k5fF7Xec-J4"}}],"keyAgreement":["did:web:mondaytrip.vercel.app#wc-notify-subscribe-key"],"authentication":["did:web:mondaytrip.vercel.app#wc-notify-authentication-key"]}
+{
+    "@context": [
+        "https://www.w3.org/ns/did/v1",
+        "https://w3id.org/security/suites/jws-2020/v1"
+    ],
+    "id": "did:web:mondaytrip-voiddy-dev.vercel.app",
+    "verificationMethod": [
+        {
+            "id": "did:web:mondaytrip-voiddy-dev.vercel.app#wc-notify-subscribe-key",
+            "type": "JsonWebKey2020",
+            "controller": "did:web:mondaytrip-voiddy-dev.vercel.app",
+            "publicKeyJwk": {
+                "kty": "OKP",
+                "crv": "X25519",
+                "x": "hnuteTTPRmQvpWbub-v1f2UvWyp8txd-5PLYicLAXQE"
+            }
+        },
+        {
+            "id": "did:web:mondaytrip-voiddy-dev.vercel.app#wc-notify-authentication-key",
+            "type": "JsonWebKey2020",
+            "controller": "did:web:mondaytrip-voiddy-dev.vercel.app",
+            "publicKeyJwk": {
+                "kty": "OKP",
+                "crv": "Ed25519",
+                "x": "Mmor1vS51vdKJiKK5dQNJyDWAET-NEq6k5fF7Xec-J4"
+            }
+        }
+    ],
+    "keyAgreement": [
+        "did:web:mondaytrip-voiddy-dev.vercel.app#wc-notify-subscribe-key"
+    ],
+    "authentication": [
+        "did:web:mondaytrip-voiddy-dev.vercel.app#wc-notify-authentication-key"
+    ]
+}
