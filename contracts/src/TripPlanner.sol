@@ -76,11 +76,11 @@ contract TripPlanner {
     Trip[] public trips;
     Hostel[] public hostels;
     Proposal[] public proposals;
-    mapping(address => uint256[]) userTrips;
-    mapping(uint256 => EnumerableSet.AddressSet) tripParticipants;
-    mapping(uint256 => Proposal[]) tripProposals;
-    mapping(uint256 => Proposal) tripAcceptedProposal;
-    mapping(uint256 => mapping(address => InvitationStatus)) tripInvitations;
+    mapping(address => uint256[]) public userTrips;
+    mapping(uint256 => EnumerableSet.AddressSet) private tripParticipants;
+    mapping(uint256 => Proposal[]) public tripProposals;
+    mapping(uint256 => Proposal) public tripAcceptedProposal;
+    mapping(uint256 => mapping(address => InvitationStatus)) public tripInvitations;
 
     modifier onlyValidAndActiveTrip(uint256 _tripId) {
         Trip memory trip = trips[_tripId];
@@ -175,19 +175,15 @@ contract TripPlanner {
         tripProposals[_tripId][_proposalId] = proposal;
     }
 
-    function payProposal(uint256 _tripId, uint256 _proposalId)
-        external
-        payable
-        onlyValidAndActiveTrip(_tripId)
-    {
+    function payProposal(uint256 _tripId) external payable onlyValidAndActiveTrip(_tripId) {
         require(
             tripParticipants[_tripId].contains(msg.sender),
             "Only trip participants can pay proposals"
         );
-        Proposal memory proposal = tripProposals[_tripId][_proposalId];
+        Proposal memory proposal = tripAcceptedProposal[_tripId];
         require(proposal.status == ProposalStatus.Accepted, "Can only pay for accepted proposals");
         proposal.status = ProposalStatus.Paid;
-        tripProposals[_tripId][_proposalId] = proposal;
+        tripAcceptedProposal[_tripId] = proposal;
         Hostel memory hostel = hostels[proposal.hostelId];
         (bool success,) = hostel.owner.call{ value: proposal.totalPriceToPay }("");
         require(success, "Payment failed");
@@ -219,6 +215,7 @@ contract TripPlanner {
         Trip memory trip = trips[_tripId];
         require(tripParticipants[_tripId].length() < trip.maxPeople, "Trip is full");
         tripParticipants[_tripId].add(msg.sender);
+        userTrips[msg.sender].push(_tripId);
     }
 
     function finishTrip(uint256 _tripId) external onlyValidAndActiveTrip(_tripId) {
@@ -254,6 +251,10 @@ contract TripPlanner {
 
     function getTripProposals(uint256 _tripId) external view returns (Proposal[] memory) {
         return tripProposals[_tripId];
+    }
+
+    function getAcceptedProposal(uint256 _tripId) external view returns (Proposal memory) {
+        return tripAcceptedProposal[_tripId];
     }
 
     function getTripParticipants(uint256 _tripId) external view returns (address[] memory) {
