@@ -20,13 +20,15 @@ export default function Header() {
                 <a href="/trips" className="mr-4 text-sm font-medium text-gray-700 hover:text-gray-900">My Trips</a>
                 <a href="/profile" className="mr-4 text-sm font-medium text-gray-700 hover:text-gray-900">My Profile</a>
                 <a href="/notifications" className="mr-4 text-sm font-medium text-gray-700 hover:text-gray-900">Notifs</a>
-                
-                <button
-                    onClick={handleHostedFlowClick}
-                    className="mr-4 text-sm font-medium text-gray-700 hover:text-gray-900"
-                >
-                    Get Funds
-                </button>
+                {address !== undefined ? (
+                    <button
+                        onClick={handleHostedFlowClick}
+                        className="mr-4 text-sm font-medium text-gray-700 hover:text-gray-900"
+                    >
+                        Get Funds
+                    </button>
+                ) : (<></>)}
+
             </div>
             <div className="flex items-center">
                 <Web3Button />
