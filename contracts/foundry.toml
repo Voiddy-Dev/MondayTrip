@@ -2,5 +2,24 @@
 src = "src"
 out = "out"
 libs = ["lib"]
+auto_detect_solc = true
+via_ir = true
 
+[fmt]
+line_length = 100
+tab_width = 4
+bracket_spacing = true
+
+[rpc_endpoints]
+ethereum = "${ETHEREUM_RPC_URL}"
+polygon = "${POLYGON_RPC_URL}"
+scrollSepolia = "${SCROLL_SEPOLIA_RPC_URL}"
+mantleTestnet = "${MANTLE_TESTNET_RPC_URL}"
+celoAlfajores = "${CELO_ALFAJORES_RPC_URL}"
+baseGoerli = "${BASE_GOERLI_RPC_URL}"
+lineaGoerli = "${LINEA_GOERLI_RPC_URL}"
+anvil = "http://localhost:8545"
+
+[etherscan]
+mainnet = { key = "${ETHERSCAN_MAINNET_KEY}" }
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config
