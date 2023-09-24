@@ -12,7 +12,7 @@ export default function UserProfile({ address }: { address: `0x${string}` }) {
     console.log(ensName);
 
     return (
-        <div className="flex flex-horizontal space-x-2 items-center">
+        <div className="flex flex-horizontal space-x-2 items-center mb-2">
             <Avatar>
                 <AvatarImage
                     src={ensAvatar.data || `https://noun-api.com/beta/pfp?name=${address}`}

@@ -2,8 +2,9 @@
 import TripStatus from "@/components/tripstatus";
 import { useParams } from "next/navigation"
 import { Calendar } from "@/components/ui/calendar"
-import { DayPicker, DateRange } from 'react-day-picker';
+import { DateRange } from 'react-day-picker';
 import UserProfile from "./userprofile";
+import { useEnsName } from 'wagmi'
 
 
 // Define the Tailwind CSS styles
@@ -80,7 +81,7 @@ export default function Trip() {
             description: "A trip to the mars",
             maxPeople: 10,
             status: "Booked",
-            organizer: "0x123",
+            organizer: "0xbA8A669738F217059a312e3F11c9b2E7344605c5",
             tripinfo: {
                 location: "Mars",
                 startDate: "2021-10-10",
@@ -103,6 +104,11 @@ export default function Trip() {
         to: endDate
     }
 
+
+    // find organizer name using `useEnsName`
+    const organizerEnsName = useEnsName({ address: tripObj.organizer as `0x${string}`, chainId: 1 })
+    const organizerdisplayname = organizerEnsName.data || tripObj.organizer;
+
     return (
         <>
             <div className={tripContainer}>
@@ -111,7 +117,7 @@ export default function Trip() {
                     <div className="flex flex-col mb-4">
                         <h2 className={tripHeader}>{tripObj.name}</h2>
                         <h3 className={tripSubheader}>Where: {tripObj.tripinfo.location}</h3>
-                        <p className={tripDetail}>Organized by: {tripObj.organizer}</p>
+                        <p className={tripDetail}>Organized by: {organizerdisplayname}</p>
                     </div>
 
                     <TripStatus
@@ -145,10 +151,14 @@ export default function Trip() {
                     <h2 className={tripHeader}>Travelers</h2>
                     <hr className="my-2" />
                     {listOfTravelers.map((user) => (
-                        <UserProfile key={user.address} address={user.address} />
+                        <UserProfile key={user.address} address={user.address as `0x${string}`} />
                     ))}
                 </div>
             </div>
+
+            {/*I want to add space at the bottom so that the contain ends before the end of the scrolling*/}
+            <div className="h-20"></div>
+
         </>
     );
 }
