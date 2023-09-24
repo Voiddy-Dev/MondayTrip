@@ -6,33 +6,12 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
+import Link from 'next/link'
+import { Button } from "@/components/ui/button"
 import TripStatus from "@/components/tripstatus"
 
-// Trip card takes in a trip object that has the following structure in solidity:
-// enum TripStatus {
-//     Planning,
-//     Booked,
-//     Finished
-// }
 
-// struct TripInformation {
-//     string startDate;
-//     string endDate;
-//     string location;
-// }
-
-// struct Trip {
-//     uint256 id;
-//     string name;
-//     string description;
-//     uint256 maxPeople;
-//     TripStatus status;
-//     address organizer;
-
-//     TripInformation tripinfo; 
-// } 
 export default function TripCard({ trip }: { trip: any }) {
-    // I want the card to be a link to a specific trip page
     return (
         <Card className="w-[350px]">
             <CardHeader>
@@ -45,6 +24,11 @@ export default function TripCard({ trip }: { trip: any }) {
                 <p>Start Date: {trip.tripinfo.startDate}</p>
                 <p>End Date: {trip.tripinfo.endDate}</p>
             </CardContent>
+            <CardFooter>
+                <Link href={`/trips/${trip.id}`}>
+                    <Button>View Trip</Button>
+                </Link>
+            </CardFooter>
         </Card>
     )
 }
