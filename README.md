@@ -1,7 +1,7 @@
 # MondayTrip
 
 ```shell
-cd mdtrip
+cd mondaytrip
 pnpm install
 pnpm run dev
 ```
