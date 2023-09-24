@@ -83,6 +83,7 @@ contract TripPlannerTest is Test {
             _endDate: "2021-01-10",
             _numberOfNights: 10
         });
+        planner.approveProposal({ _tripId: 0, _proposalId: 0 });
         planner.acceptProposal({ _tripId: 0, _proposalId: 0 });
         TripPlanner.Proposal memory proposal = planner.getAcceptedProposal(0);
         assertEq(proposal.status == TripPlanner.ProposalStatus.Accepted, true);
@@ -96,11 +97,20 @@ contract TripPlannerTest is Test {
             _endDate: "2021-01-10",
             _numberOfNights: 10
         });
+        planner.approveProposal({ _tripId: 0, _proposalId: 0 });
         planner.acceptProposal({ _tripId: 0, _proposalId: 0 });
         TripPlanner.Proposal memory proposal = planner.getAcceptedProposal(0);
         deal(address(this), proposal.totalPriceToPay);
-        planner.payProposal{ value: proposal.totalPriceToPay }({ _tripId: 0 });
+        planner.contributeToTrip{ value: proposal.totalPriceToPay }({ _tripId: 0 });
+        planner.payProposal({ _tripId: 0 });
         assertEq(alice.balance, proposal.totalPriceToPay);
+    }
+
+    function test_contributeToTrip() public {
+        deal(address(this), 1 ether);
+        planner.contributeToTrip{ value: 1 ether }({ _tripId: 0 });
+        assertEq(planner.totalTripPool(0), 1 ether);
+        assertEq(planner.tripContributions(0, address(this)), 1 ether);
     }
 
     function test_inviteParticipant() public {
