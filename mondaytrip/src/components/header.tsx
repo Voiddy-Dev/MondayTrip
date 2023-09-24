@@ -19,6 +19,7 @@ export default function Header() {
                 <a href="/" className="mr-4 text-sm font-medium text-gray-700 hover:text-gray-900">Explore</a>
                 <a href="/trips" className="mr-4 text-sm font-medium text-gray-700 hover:text-gray-900">My Trips</a>
                 <a href="/profile" className="mr-4 text-sm font-medium text-gray-700 hover:text-gray-900">My Profile</a>
+                <a href="/notifications" className="mr-4 text-sm font-medium text-gray-700 hover:text-gray-900">Notifs</a>
                 
                 <button
                     onClick={handleHostedFlowClick}

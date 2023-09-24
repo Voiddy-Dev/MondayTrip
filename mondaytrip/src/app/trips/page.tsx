@@ -59,7 +59,7 @@ export default function Trips() {
                         <DialogHeader>
                             <DialogTitle>Add a new trip</DialogTitle>
                             <DialogDescription>
-                                Add information about your trip here. Click save when you're done.
+                                Add information about your trip here. Click save when you are done.
                             </DialogDescription>
                         </DialogHeader>
                         <div className="grid gap-4 py-4">
