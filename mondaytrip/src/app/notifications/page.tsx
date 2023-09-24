@@ -94,15 +94,15 @@ export default function Notifications() {
             url: window.location.origin,
             type: "promotional",
         });
-        console.log("it triggers");
     }, [handleSendNotification]);
 
     return (
         <div>
             <p>Subscribe to notifications</p>
             <button onClick={subscribe}>
-                Send test notification
+                Subscribe
             </button>
+            <p>{isSubscribed}</p>
         </div>
     )
 }
