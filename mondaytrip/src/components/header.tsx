@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button"
+import { Web3Button } from "@web3modal/react"
 
 export default function Header() {
     return (
@@ -13,7 +13,7 @@ export default function Header() {
                 <a href="/trips" className="mr-4 text-sm font-medium text-gray-700 hover:text-gray-900">My Trips</a>
             </div>
             <div className="flex items-center">
-                <Button>Connect</Button>
+                <Web3Button />
             </div>
         </div>
     )
